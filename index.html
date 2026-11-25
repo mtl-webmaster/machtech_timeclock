@@ -270,6 +270,28 @@ function sampleTag(el){ const t=document.createElement('div'); t.className='samp
         <div class="clock-help"><a href="${S.punchUrl}">Clock not loading? Tap here</a></div>
         ${lunch}</div>`;
     const view = document.getElementById('clockView');
+    // Tablet app v8+: the punch site refuses to load inside a frame, so the
+    // app draws its own panel over this box instead. Same trim and zoom.
+    if (window.HYDKiosk && typeof HYDKiosk.showClock === 'function'){
+      const send = () => {
+        const r = view.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+        if (r.width < 10 || r.height < 10) return;
+        const sc = Math.min(r.width / S.clockPageWidth, r.height / S.clockFitHeight);
+        HYDKiosk.showClock(JSON.stringify({
+          url: S.punchUrl,
+          x: Math.round(r.left*d), y: Math.round(r.top*d),
+          w: Math.round(r.width*d), h: Math.round(r.height*d),
+          iw: Math.round(S.clockPageWidth*d), ih: Math.round((S.clockTrimTop + S.clockFitHeight)*d),
+          sc: sc, tx: Math.round((r.width - S.clockPageWidth*sc)/2*d), ty: Math.round(-S.clockTrimTop*sc*d),
+          reset: S.clockResetSeconds
+        }));
+      };
+      send(); new ResizeObserver(send).observe(view);
+      window.addEventListener('resize', send);
+      if (document.fonts) document.fonts.ready.then(send);
+      setTimeout(send, 1500);
+      return;
+    }
     const f = document.createElement('iframe');
     f.setAttribute('scrolling','no'); f.src = S.punchUrl;
     f.style.width = S.clockPageWidth + 'px';

@@ -4,6 +4,6 @@
   "keepScreenOn": true,
   "checkMinutes": 5,
   "returnSeconds": 120,
-  "appVersion": 7,
+  "appVersion": 8,
   "apkUrl": "https://mtl-webmaster.github.io/machtech_timeclock/hyd-kiosk.apk"
 }
